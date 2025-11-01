@@ -7,7 +7,7 @@ class TranscriptProcessor:
     def __init__(self):
         # Configure Gemini
         genai.configure(api_key=settings.GEMINI_API_KEY)
-        self.model = genai.GenerativeModel('gemini-1.5-flash')  # Fast and free
+        self.model = genai.GenerativeModel('gemini-2.5-pro')  # Fast and free
         # or use 'gemini-1.5-pro' for better quality
     
     async def extract_check_in_data(self, transcript: str) -> Dict[str, Any]:

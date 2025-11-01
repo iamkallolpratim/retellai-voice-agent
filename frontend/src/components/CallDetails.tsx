@@ -78,7 +78,7 @@ export const CallDetails: React.FC<{
             <div>
               <h4 className="font-bold text-lg mb-3">Full Transcript</h4>
               <div className="p-4 border-2 border-black bg-gray-50 whitespace-pre-wrap font-mono text-sm max-h-96 overflow-y-auto">
-                {result.transcript || 'Transcript not available'}
+                {result.full_transcript || 'Transcript not available'}
               </div>
             </div>
           </>

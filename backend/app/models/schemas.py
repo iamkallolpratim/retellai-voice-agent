@@ -1,5 +1,5 @@
 # backend/app/models/schemas.py
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field, field_validator
 from typing import Optional, Dict, Any, Literal
 from datetime import datetime
 from uuid import UUID
@@ -7,10 +7,10 @@ from uuid import UUID
 # ==================== Agent Configuration ====================
 class AgentConfigBase(BaseModel):
     name: str = Field(..., min_length=1, max_length=255)
-    scenario_type: Literal["driver_checkin", "emergency_protocol"]
+    scenario_type: Literal["check-in", "emergency"]
     system_prompt: str = Field(..., min_length=10)
     backchanneling: bool = True
-    interruption_sensitivity: float = Field(0.7, ge=0.0, le=1.0)
+    interruption_sensitivity: int = Field(50, ge=0, le=100)
     filler_words: bool = True
 
 class AgentConfigCreate(AgentConfigBase):
@@ -18,16 +18,17 @@ class AgentConfigCreate(AgentConfigBase):
 
 class AgentConfigUpdate(BaseModel):
     name: Optional[str] = None
-    scenario_type: Optional[Literal["driver_checkin", "emergency_protocol"]] = None
+    scenario_type: Optional[Literal["check-in", "emergency"]] = None
     system_prompt: Optional[str] = None
     backchanneling: Optional[bool] = None
-    interruption_sensitivity: Optional[float] = None
+    interruption_sensitivity: Optional[int] = None
     filler_words: Optional[bool] = None
 
 class AgentConfig(AgentConfigBase):
     id: UUID
+    retell_agent_id: Optional[str] = None
     created_at: datetime
-    updated_at: datetime
+    updated_at: Optional[datetime] = None
     
     class Config:
         from_attributes = True
@@ -36,17 +37,8 @@ class AgentConfig(AgentConfigBase):
 class CallCreate(BaseModel):
     agent_config_id: UUID
     driver_name: str = Field(..., min_length=1, max_length=255)
-    phone_number: str = Field(..., pattern=r'^\+?1?\d{10,15}$')
+    phone_number: str = Field(..., min_length=10, max_length=20)
     load_number: str = Field(..., min_length=1, max_length=50)
-    
-    @validator('phone_number')
-    def format_phone(cls, v):
-        # Remove all non-digit characters
-        digits = ''.join(filter(str.isdigit, v))
-        # Ensure it starts with country code
-        if not v.startswith('+'):
-            digits = '1' + digits if len(digits) == 10 else digits
-        return '+' + digits
 
 class CallStatus(BaseModel):
     id: UUID
@@ -54,6 +46,9 @@ class CallStatus(BaseModel):
     retell_call_id: Optional[str] = None
     created_at: datetime
     completed_at: Optional[datetime] = None
+    
+    class Config:
+        from_attributes = True
 
 class Call(BaseModel):
     id: UUID
@@ -61,43 +56,51 @@ class Call(BaseModel):
     driver_name: str
     phone_number: str
     load_number: str
-    retell_call_id: Optional[str]
+    retell_call_id: Optional[str] = None
     status: str
     created_at: datetime
-    completed_at: Optional[datetime]
+    completed_at: Optional[datetime] = None
+    updated_at: Optional[datetime] = None
     
     class Config:
         from_attributes = True
 
 # ==================== Call Results ====================
 class DriverCheckinResult(BaseModel):
-    call_outcome: Literal["In-Transit Update", "Arrival Confirmation", "Delayed"]
-    driver_status: Literal["Driving", "Delayed", "Arrived", "Unloading"]
-    current_location: str
+    call_outcome: Optional[str] = None
+    driver_status: Optional[str] = None
+    current_location: Optional[str] = None
     eta: Optional[str] = None
-    delay_reason: Optional[str] = "None"
-    unloading_status: str = "N/A"
-    pod_reminder_acknowledged: bool
+    delay_reason: Optional[str] = None
+    unloading_status: Optional[str] = None
+    pod_reminder_acknowledged: Optional[bool] = None
 
 class EmergencyResult(BaseModel):
-    call_outcome: Literal["Emergency Escalation"]
-    emergency_type: Literal["Accident", "Breakdown", "Medical", "Other"]
-    safety_status: str
-    injury_status: str
-    emergency_location: str
-    load_secure: bool
-    escalation_status: str = "Connected to Human Dispatcher"
+    call_outcome: Optional[str] = None
+    emergency_type: Optional[str] = None
+    safety_status: Optional[str] = None
+    injury_status: Optional[str] = None
+    emergency_location: Optional[str] = None
+    load_secure: Optional[bool] = None
+    escalation_status: Optional[str] = None
 
 class CallResultCreate(BaseModel):
     call_id: UUID
-    call_outcome: str
-    structured_data: Dict[str, Any]
-    full_transcript: str
-    duration: int  # in seconds
+    full_transcript: Optional[str] = None
+    structured_data: Optional[Dict[str, Any]] = None
+    call_duration: Optional[int] = None
 
-class CallResult(CallResultCreate):
+class CallResult(BaseModel):
     id: UUID
+    call_id: UUID
+    full_transcript: Optional[str] = None
+    structured_data: Optional[Dict[str, Any]] = None
+    call_duration: Optional[int] = None
+    call_summary: Optional[str] = None
+    user_sentiment: Optional[str] = None
+    call_successful: Optional[bool] = None
     created_at: datetime
+    updated_at: Optional[datetime] = None
     
     class Config:
         from_attributes = True
@@ -105,24 +108,19 @@ class CallResult(CallResultCreate):
 # ==================== Retell Webhook Payloads ====================
 class RetellWebhookEvent(BaseModel):
     event: str
-    call_id: str
-    timestamp: datetime
+    call: Dict[str, Any]
 
-class RetellCallStarted(RetellWebhookEvent):
+class RetellCallStarted(BaseModel):
     event: Literal["call_started"]
-    agent_id: str
+    call: Dict[str, Any]
 
-class RetellCallEnded(RetellWebhookEvent):
+class RetellCallEnded(BaseModel):
     event: Literal["call_ended"]
-    transcript: str
-    recording_url: Optional[str] = None
-    call_analysis: Optional[Dict[str, Any]] = None
-    end_reason: Optional[str] = None
+    call: Dict[str, Any]
 
-class RetellCallAnalyzed(RetellWebhookEvent):
+class RetellCallAnalyzed(BaseModel):
     event: Literal["call_analyzed"]
-    transcript: str
-    call_analysis: Dict[str, Any]
+    call: Dict[str, Any]
 
 # ==================== Response Models ====================
 class ErrorResponse(BaseModel):

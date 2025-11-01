@@ -66,7 +66,7 @@ async def create_agent_config(config: AgentConfigCreate):
         config_dict = config.model_dump()
         config_dict["retell_agent_id"] = retell_agent.get("agent_id")
         
-        db_config = await db_service.create_agent_config(config_dict)
+        db_config = db_service.create_agent_config(config_dict)
         
         return AgentConfig(**db_config)
         
@@ -93,7 +93,7 @@ async def list_agent_configs():
     Retrieve all agent configurations
     """
     try:
-        configs = await db_service.list_agent_configs()
+        configs = db_service.list_agent_configs()
         return [AgentConfig(**config) for config in configs]
     except Exception as e:
         raise HTTPException(
@@ -111,7 +111,7 @@ async def get_agent_config(config_id: UUID):
     Retrieve a specific agent configuration
     """
     try:
-        config = await db_service.get_agent_config(config_id)
+        config = db_service.get_agent_config(config_id)
         if not config:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
@@ -137,7 +137,7 @@ async def update_agent_config(config_id: UUID, update: AgentConfigUpdate):
     """
     try:
         # Check if config exists
-        existing_config = await db_service.get_agent_config(config_id)
+        existing_config = db_service.get_agent_config(config_id)
         if not existing_config:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
@@ -146,7 +146,7 @@ async def update_agent_config(config_id: UUID, update: AgentConfigUpdate):
         
         # Update in database
         update_dict = update.model_dump(exclude_none=True)
-        updated_config = await db_service.update_agent_config(config_id, update_dict)
+        updated_config = db_service.update_agent_config(config_id, update_dict)
         
         # Update Retell agent if basic fields changed
         retell_agent_id = existing_config.get("retell_agent_id")
@@ -183,7 +183,7 @@ async def delete_agent_config(config_id: UUID):
     """
     try:
         # Get config to find Retell agent ID
-        config = await db_service.get_agent_config(config_id)
+        config = db_service.get_agent_config(config_id)
         if not config:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
@@ -198,7 +198,7 @@ async def delete_agent_config(config_id: UUID):
                 print(f"Warning: Failed to delete Retell agent: {e}")
         
         # Delete from database
-        success = await db_service.delete_agent_config(config_id)
+        success = db_service.delete_agent_config(config_id)
         
         if not success:
             raise HTTPException(

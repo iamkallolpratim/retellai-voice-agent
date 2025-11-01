@@ -209,7 +209,7 @@ ngrok http 8000
 
 Then in Retell AI Dashboard:
 1. Go to Settings → Webhooks
-2. Add webhook: `https://YOUR_NGROK_URL.ngrok.io/api/webhooks/retell`
+2. Add webhook: `https://YOUR_NGROK_URL.ngrok.io/api/v1/webhooks/retell`
 3. Enable events: `call_started`, `call_ended`, `call_analyzed`
 
 ### **4. Get API Keys**

@@ -70,7 +70,8 @@ class APIService {
   }
 
   async listCalls(limit: number = 50, offset: number = 0): Promise<Call[]> {
-    return this.request<Call[]>(`/calls?limit=${limit}&offset=${offset}`);
+    console.log("Listing calls with limit:", limit, "and offset:", offset);
+    return this.request<Call[]>(`/calls?limit=100&offset=${offset}`);
   }
 
   async getCall(id: string): Promise<Call> {

@@ -45,7 +45,7 @@ export interface AgentConfig {
     id: string;
     call_id: string;
     structured_data: Record<string, any>;
-    transcript: string;
+    full_transcript: string;
     call_duration?: number;
     created_at: string;
   }

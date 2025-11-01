@@ -27,7 +27,7 @@ async def create_call(call_data: CallCreate):
     """
     try:
         # Get agent configuration
-        agent_config = await db_service.get_agent_config(call_data.agent_config_id)
+        agent_config = db_service.get_agent_config(call_data.agent_config_id)
         if not agent_config:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
@@ -68,7 +68,7 @@ async def create_call(call_data: CallCreate):
             "retell_call_id": retell_web_call.get("call_id"),
             "status": "pending"  # Use valid status from constraint
         }
-        db_call = await db_service.create_call(call_dict)
+        db_call = db_service.create_call(call_dict)
         
         # Return call details with access_token for frontend
         return {
@@ -100,7 +100,7 @@ async def list_calls(limit: int = 50, offset: int = 0):
     Retrieve all calls with pagination
     """
     try:
-        calls = await db_service.list_calls(limit=limit, offset=offset)
+        calls = db_service.list_calls(limit=limit, offset=offset)
         return [Call(**call) for call in calls]
     except Exception as e:
         raise HTTPException(
@@ -118,7 +118,7 @@ async def get_call(call_id: UUID):
     Retrieve a specific call
     """
     try:
-        call = await db_service.get_call(call_id)
+        call = db_service.get_call(call_id)
         if not call:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
@@ -143,7 +143,7 @@ async def get_call_status(call_id: UUID):
     Get the current status of a call
     """
     try:
-        call = await db_service.get_call(call_id)
+        call = db_service.get_call(call_id)
         if not call:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
@@ -172,7 +172,7 @@ async def get_call_status(call_id: UUID):
                     if mapped_status == "completed":
                         update_data["completed_at"] = retell_call.get("end_timestamp")
                     
-                    await db_service.update_call(call_id, update_data)
+                    db_service.update_call(call_id, update_data)
                     call["status"] = mapped_status
                     
             except Exception as e:
@@ -194,12 +194,12 @@ async def get_call_status(call_id: UUID):
     response_model=CallResult,
     summary="Get call result"
 )
-async def get_call_result(call_id: UUID):
+def get_call_result(call_id: UUID):
     """
     Retrieve the structured result of a completed call
     """
     try:
-        result = await db_service.get_call_result(call_id)
+        result =  db_service.get_call_result(call_id)
         if not result:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
