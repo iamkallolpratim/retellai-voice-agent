@@ -5,7 +5,7 @@ export interface AgentConfig {
     backchanneling: boolean;
     filler_words: boolean;
     interruption_sensitivity: number;
-    scenario_type: 'check-in' | 'emergency';
+    scenario_type: 'driver_checkin' | 'emergency_protocol';
     retell_agent_id?: string;
     created_at?: string;
     updated_at?: string;
@@ -17,7 +17,7 @@ export interface AgentConfig {
     backchanneling: boolean;
     filler_words: boolean;
     interruption_sensitivity: number;
-    scenario_type: 'check-in' | 'emergency';
+    scenario_type: 'driver_checkin' | 'emergency_protocol';
   }
   
   export interface CallRequest {

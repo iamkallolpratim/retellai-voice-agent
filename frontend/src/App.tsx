@@ -51,7 +51,7 @@ const App: React.FC = () => {
     backchanneling: true,
     filler_words: true,
     interruption_sensitivity: 50,
-    scenario_type: "check-in",
+    scenario_type: "driver_checkin",
   });
   const [editingConfigId, setEditingConfigId] = useState<string | null>(null);
   const [callRequest, setCallRequest] = useState<CallRequest>({
@@ -116,6 +116,8 @@ const App: React.FC = () => {
         showNotification("success", "Configuration updated successfully");
         setEditingConfigId(null);
       } else {
+        console.log("Creating config:", currentConfig);
+        currentConfig.interruption_sensitivity = currentConfig.interruption_sensitivity / 100
         await createConfig(currentConfig);
         showNotification("success", "Configuration created successfully");
       }
@@ -126,7 +128,7 @@ const App: React.FC = () => {
         backchanneling: true,
         filler_words: true,
         interruption_sensitivity: 50,
-        scenario_type: "check-in",
+        scenario_type: "driver_checkin",
       });
     } catch (error) {
       showNotification(
@@ -161,7 +163,7 @@ const App: React.FC = () => {
       backchanneling: true,
       filler_words: true,
       interruption_sensitivity: 50,
-      scenario_type: "check-in",
+      scenario_type: "driver_checkin",
     });
   };
 

@@ -33,7 +33,7 @@ export const ConfigList: React.FC<{
                   <div className="flex-1">
                     <div className="font-bold text-lg">{config.name}</div>
                     <div className="text-sm text-gray-600 mt-1">
-                      {config.scenario_type === 'check-in' ? '📋 Check-in' : '🚨 Emergency'} Scenario
+                      {config.scenario_type === 'driver_checkin' ? '📋 Check-in' : '🚨 Emergency'} Scenario
                     </div>
                     {config.retell_agent_id && (
                       <div className="text-xs text-gray-500 mt-1 font-mono">

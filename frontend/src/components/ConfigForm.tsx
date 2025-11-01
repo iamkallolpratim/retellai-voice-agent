@@ -25,11 +25,11 @@ export const ConfigForm: React.FC<{
           <label className="block font-semibold mb-2">Scenario Type *</label>
           <select
             value={config.scenario_type}
-            onChange={(e) => onChange({ ...config, scenario_type: e.target.value as 'check-in' | 'emergency' })}
+            onChange={(e) => onChange({ ...config, scenario_type: e.target.value as 'driver_checkin' | 'emergency_protocol' })}
             className="w-full p-3 border-2 border-black focus:outline-none focus:ring-2 focus:ring-gray-400"
           >
-            <option value="check-in">End-to-End Driver Check-in</option>
-            <option value="emergency">Dynamic Emergency Protocol</option>
+            <option value="driver_checkin">End-to-End Driver Check-in</option>
+            <option value="emergency_protocol">Dynamic Emergency Protocol</option>
           </select>
         </div>
   
