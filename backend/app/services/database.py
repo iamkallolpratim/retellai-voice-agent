@@ -69,13 +69,17 @@ class DatabaseService:
             .execute()
         return response.data[0] if response.data else None
     
-    async def get_call_by_retell_id(self, retell_call_id: str) -> Optional[Dict[str, Any]]:
+    async def get_call_by_retell_id(self, retell_call_id: str) -> Optional[dict]:
         """Get call by Retell call ID"""
-        response = self.client.table("calls")\
-            .select("*")\
-            .eq("retell_call_id", retell_call_id)\
-            .execute()
-        return response.data[0] if response.data else None
+        query = """
+            SELECT * FROM calls 
+            WHERE retell_call_id = :retell_call_id
+        """
+        result = await self.db.fetch_one(
+            query=query,
+            values={"retell_call_id": retell_call_id}
+        )
+        return dict(result) if result else None
     
     async def update_call(
         self, 

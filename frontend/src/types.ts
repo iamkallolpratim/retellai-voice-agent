@@ -37,8 +37,8 @@ export interface AgentConfig {
     status: 'pending' | 'in_progress' | 'completed' | 'failed';
     created_at: string;
     completed_at?: string;
-    access_token?: string;
-    sample_rate?: number;
+    access_token?: string;  // ← Make sure this is here
+    sample_rate?: number;   // ← Make sure this is here
   }
   
   export interface CallResult {
